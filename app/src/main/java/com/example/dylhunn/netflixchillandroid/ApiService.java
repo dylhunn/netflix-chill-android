@@ -16,8 +16,8 @@ public class ApiService {
      * @param uid
      * @return
      */
-    public static UID_STATUS isUilStillValid(int uid) {
-        return null;
+    public static UID_STATUS isUidStillValid(int uid) {
+        return UID_STATUS.INVALID;
     }
 
     /**
@@ -29,7 +29,7 @@ public class ApiService {
      * @return
      */
     public static Integer l34ogin(String mEmail, String mPassword) {
-        Document doc = Jsoup.connect("")
+        //Document doc = Jsoup.connect("");
         return null;
     }
 }

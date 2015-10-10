@@ -28,6 +28,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.content.Context;
+
 
 
 /**
@@ -46,6 +48,8 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
+
+    public static Context ctx;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -253,9 +257,24 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
      * Attempts to log the user in if we know the user's ID already.
      */
     public void attemptAutoLogin() {
-        Integer uid = DataPersist.getUserId();
-        if (uid == null || uid < 0) return; // Auto-login failed
-        //ApiService.checkUidIsValid(uid);
+        ctx = this.getApplicationContext();
+        DataPersist d = new DataPersist(this.getApplicationContext());
+        Integer uid = d.getUserId();
+        if (uid == null || uid < 0) return; // We don't have a uid saved
+        ApiService.UID_STATUS st = ApiService.isUidStillValid(uid);
+        if (st.equals(ApiService.UID_STATUS.INVALID)) {
+            d.clearStoredUserId();
+            return;
+        }
+        if (st.equals(ApiService.UID_STATUS.CONNECTION_FAILURE)) {
+            // TODO display error
+            return;
+        }
+
+        assert (st.equals(ApiService.UID_STATUS.VALID));
+
+        // The UID is good
+
     }
 
     /**
@@ -312,7 +331,8 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
                 mPasswordView.requestFocus();
             } else { // success
                 // save the userID
-                DataPersist.setUserId(user_id);
+                DataPersist d = new DataPersist(LoginActivity.ctx);
+                d.setUserId(user_id);
                 attemptAutoLogin();
                 finish();
             }
