@@ -1,26 +1,33 @@
 package com.example.dylhunn.netflixchillandroid;
 
-
+import android.content.Intent;
+import com.google.android.gms.common.ConnectionResult;
 import android.net.Uri;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.FragmentTransaction;
-
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.TextView;
-import android.content.Intent;
+import android.util.Log;
 
-public class ChillActivity extends ActionBarActivity implements ActionBar.TabListener, FindMatchesFragment.OnFragmentInteractionListener {
+import android.location.Location;
+
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationServices;
+
+public class ChillActivity extends ActionBarActivity implements ActionBar.TabListener, FindMatchesFragment.OnFragmentInteractionListener,
+        ConnectionCallbacks, OnConnectionFailedListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -34,21 +41,37 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
 
     private int uid;
 
+    private GoogleApiClient mGoogleApiClient;
+
+    // horrible data sharing :)
+    public static Location lastLocation = null;
+
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+
+    protected synchronized void buildGoogleApiClient() {
+        Log.i("NetflixAndChill", "Building API Client");
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mGoogleApiClient.connect();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chill);
 
+        buildGoogleApiClient();
+
         Intent intent = getIntent();
         int uid = intent.getIntExtra("uid", -1);
         assert (uid >= 0);
         this.uid = uid;
-
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -174,6 +197,26 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
 
     @Override
     public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.e("NetflixAndChill", "Error connecting to location API");
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.i("NetflixAndChill", "OnConnected Triggered");
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (lastLocation != null) Log.i("NetflixAndChill", "Found location " + lastLocation.getLatitude() + " " + lastLocation.getLongitude());
+        else Log.e("NetflixAndChill", "Location was null!");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult c) {
+        Log.e("NetflixAndChill", "Error connecting to location API");
 
     }
 

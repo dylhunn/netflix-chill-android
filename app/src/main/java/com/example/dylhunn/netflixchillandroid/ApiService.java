@@ -16,7 +16,6 @@ public class ApiService {
      */
     public static UID_STATUS isUidStillValid(int uid) {
         if (uid == 9) return UID_STATUS.VALID;
-
         return UID_STATUS.INVALID;
     }
 
@@ -28,9 +27,26 @@ public class ApiService {
      * @param mPassword
      * @return
      */
-    public static Integer l34ogin(String mEmail, String mPassword) {
-
-        //Document doc = Jsoup.connect("");
+    public static Integer login(String mEmail, String mPassword) {
         return 9;
+    }
+
+    /**
+     * Send the server a chill request. The Chill request ID should be sent back.
+     * Return -1 if something failed.
+     * @param uid
+     * @param request
+     * @return
+     */
+    public static int makeChillRequest(int uid, ChillRequest request) {
+
+    }
+
+    /**
+     * Try to delete a chill request by ID. If something failed, return false.
+     * @return
+     */
+    public static boolean deleteChillRequest(int chill_id) {
+
     }
 }
