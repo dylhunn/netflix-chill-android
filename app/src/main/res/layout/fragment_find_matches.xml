@@ -54,5 +54,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentLeft="true"
         android:padding="10dp"
+        android:onClick="goClicked"
         />
 </RelativeLayout>

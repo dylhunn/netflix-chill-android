@@ -8,6 +8,7 @@ import android.location.Location;
 public class ChillRequest {
     public final String GENRE;
     public final MediaType TYPE;
+    // could be null if we don't know the location
     public final Location LOCATION;
 
 

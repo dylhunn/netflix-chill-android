@@ -8,6 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
+import android.content.Context;
+import android.widget.Toast;
+import android.support.v7.app.ActionBarActivity;
+
+
 import android.widget.ArrayAdapter;
 
 /**
@@ -136,5 +141,4 @@ public class FindMatchesFragment extends Fragment {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
-
 }

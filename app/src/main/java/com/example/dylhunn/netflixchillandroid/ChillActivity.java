@@ -1,5 +1,6 @@
 package com.example.dylhunn.netflixchillandroid;
 
+import android.content.Context;
 import android.content.Intent;
 import com.google.android.gms.common.ConnectionResult;
 import android.net.Uri;
@@ -16,10 +17,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.util.Log;
 
 import android.location.Location;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -220,6 +223,38 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
 
     }
 
+
+    public void goClicked(View v) {
+        Spinner genreSpn = (Spinner) findViewById(R.id.genreSpinner);
+        Spinner typeSpn = (Spinner) findViewById(R.id.typeSpinner);
+        Spinner whenSpn = (Spinner) findViewById(R.id.whenSpinner);
+        String type = typeSpn.getSelectedItem().toString();
+        ChillRequest.MediaType mtype;
+        if (type.contains("TV")) {
+            mtype = ChillRequest.MediaType.TV_SHOW;
+        } else {
+            mtype = ChillRequest.MediaType.FILM;
+        }
+
+        ChillRequest cr = new ChillRequest(genreSpn.getSelectedItem().toString(), mtype);
+
+        int chillRequestId = ApiService.makeChillRequest(uid, cr);
+
+        // something failed
+        if (chillRequestId == -1) {
+            Context context = getApplicationContext();
+            CharSequence text = "Oops! We couldn't make your request.";
+            int duration = Toast.LENGTH_LONG;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        } else {
+            // slide to next tab
+            getSupportActionBar().setSelectedNavigationItem(1);
+        }
+
+
+    }
     /**
      * A placeholder fragment containing a simple view.
      */

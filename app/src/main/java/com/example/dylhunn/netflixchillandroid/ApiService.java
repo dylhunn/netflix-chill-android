@@ -39,7 +39,7 @@ public class ApiService {
      * @return
      */
     public static int makeChillRequest(int uid, ChillRequest request) {
-
+        return -1;
     }
 
     /**
@@ -47,6 +47,6 @@ public class ApiService {
      * @return
      */
     public static boolean deleteChillRequest(int chill_id) {
-
+        return true;
     }
 }
