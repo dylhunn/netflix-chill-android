@@ -84,8 +84,8 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
 
         // Let's try the default login
         DataPersist d = new DataPersist(getApplicationContext());
-        int stored_uid = d.getUserId();
-        if (stored_uid != 0) {
+        Integer stored_uid = d.getUserId();
+        if (stored_uid != null && stored_uid > 0) {
             ApiService.confirmUidAndLogin(stored_uid, this);
         }
     }
@@ -156,7 +156,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         int duration = Toast.LENGTH_LONG;
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
-}
+    }
 
     public void uid_is_valid_and_login(int uid) {
         showProgress(false);
@@ -175,7 +175,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
     public void uid_check_response_error() {
         showProgress(false);
         Context context = getApplicationContext();
-        CharSequence text = "Oops! We couldn't connect to the server.";
+        CharSequence text = "Oops! We couldn't connect to the User ID server.";
         int duration = Toast.LENGTH_LONG;
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
@@ -197,7 +197,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
     public void register_fail() {
         showProgress(false);
         Context context = getApplicationContext();
-        CharSequence text = "Oops! We couldn't connect to the server.";
+        CharSequence text = "Oops! We couldn't connect to the login server.";
         int duration = Toast.LENGTH_LONG;
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();

@@ -20,6 +20,9 @@ public class ApiService {
      * @return
      */
     public static void confirmUidAndLogin(final int uid, final LoginActivity act) {
+        // Testing only
+        act.uid_is_valid_and_login(uid);
+
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(act.getApplicationContext());
@@ -52,6 +55,10 @@ public class ApiService {
      * @return
      */
     public static void registerOrLookup(String mEmail, String mPassword, final LoginActivity act) {
+        // Testing only
+        act.register_success("1");
+
+
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(act.getApplicationContext());
         String url = "http://www.google.com";
