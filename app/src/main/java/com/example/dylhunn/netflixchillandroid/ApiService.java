@@ -1,7 +1,5 @@
 package com.example.dylhunn.netflixchillandroid;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 /**
  * Created by richard on 10/10/15.
@@ -17,6 +15,8 @@ public class ApiService {
      * @return
      */
     public static UID_STATUS isUidStillValid(int uid) {
+        if (uid == 9) return UID_STATUS.VALID;
+
         return UID_STATUS.INVALID;
     }
 
@@ -31,6 +31,6 @@ public class ApiService {
     public static Integer l34ogin(String mEmail, String mPassword) {
 
         //Document doc = Jsoup.connect("");
-        return null;
+        return 9;
     }
 }

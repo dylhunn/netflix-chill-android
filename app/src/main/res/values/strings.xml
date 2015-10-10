@@ -15,4 +15,26 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="title_activity_chill">ChillActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="genre_array">
+        <item>Comedy</item>
+        <item>Drama</item>
+        <item>Horror</item>
+    </string-array>
+
+    <string-array name="type_array">
+        <item>Movie</item>
+        <item>TV Show</item>
+    </string-array>
+
+    <string-array name="when_array">
+        <item>Tonight</item>
+        <item>Tomorrow night</item>
+    </string-array>
 </resources>

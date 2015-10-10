@@ -25,10 +25,13 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.content.Intent;
 
 import java.util.ArrayList;
 import java.util.List;
 import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
 
 
 
@@ -62,9 +65,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Actiona bar text
-        getActionBar().setTitle("Netflix+Chill");
-        getSupportActionBar().setTitle("Netflix+Chill");
+
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -92,6 +93,9 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        // Action bar text
+        setTitle("Netflix+Chill");
 
         attemptAutoLogin();
     }
@@ -257,6 +261,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
      * Attempts to log the user in if we know the user's ID already.
      */
     public void attemptAutoLogin() {
+        showProgress(true);
         ctx = this.getApplicationContext();
         DataPersist d = new DataPersist(this.getApplicationContext());
         Integer uid = d.getUserId();
@@ -264,17 +269,32 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         ApiService.UID_STATUS st = ApiService.isUidStillValid(uid);
         if (st.equals(ApiService.UID_STATUS.INVALID)) {
             d.clearStoredUserId();
+            Log.e("NetflixChillAndroid", "The stored userid was invalid. Deleting.");
+            showProgress(false);
+
             return;
         }
         if (st.equals(ApiService.UID_STATUS.CONNECTION_FAILURE)) {
             // TODO display error
+            Log.e("NetflixChillAndroid", "Could not connect to server for login.");
+            showProgress(false);
+
             return;
         }
 
         assert (st.equals(ApiService.UID_STATUS.VALID));
 
         // The UID is good
+        Log.i("NetflixChillAndroid", "UID loaded: " + uid);
 
+        Intent intent = new Intent(this, ChillActivity.class);
+        intent.putExtra("uid", uid);
+        showProgress(false);
+
+        startActivity(intent);
+
+        // kill ourselves
+        finish();
     }
 
     /**
@@ -293,27 +313,8 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
 
         @Override
         protected Integer doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-            /*
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-            */
-
             // Todo get user ID
-            Integer user_id = 3; //ApiService.login(mEmail, mPassword);
-
+            Integer user_id = ApiService.l34ogin(mEmail, mPassword);
             return user_id;
         }
 
