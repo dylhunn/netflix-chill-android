@@ -31,16 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<Cursor> {
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
 
     public static Context ctx;
 
@@ -85,7 +81,13 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         // Action bar text
         setTitle("Netflix+Chill");
 
-        attemptAutoLogin();
+
+        // Let's try the default login
+        DataPersist d = new DataPersist(getApplicationContext());
+        int stored_uid = d.getUserId();
+        if (stored_uid != 0) {
+            ApiService.confirmUidAndLogin(stored_uid, this);
+        }
     }
 
     private void populateAutoComplete() {
@@ -99,9 +101,6 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
 
         // Reset errors.
         mEmailView.setError(null);
@@ -140,10 +139,71 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+
+            // we are ready to try the credentials!
+            ApiService.registerOrLookup(email, password, this);
         }
     }
+
+    // VOLLEY CALLBACKS
+
+    public void uid_is_invalid() {
+        showProgress(false);
+        DataPersist d = new DataPersist(getApplicationContext());
+        d.clearStoredUserId();
+        Context context = getApplicationContext();
+        CharSequence text = "Your login info seems to have expired.";
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+}
+
+    public void uid_is_valid_and_login(int uid) {
+        showProgress(false);
+        Log.i("NetflixChillAndroid", "UID loaded: " + uid);
+
+        Intent intent = new Intent(this, ChillActivity.class);
+        intent.putExtra("uid", uid);
+        showProgress(false);
+
+        startActivity(intent);
+
+        // kill ourselves
+        finish();
+    }
+
+    public void uid_check_response_error() {
+        showProgress(false);
+        Context context = getApplicationContext();
+        CharSequence text = "Oops! We couldn't connect to the server.";
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+    }
+
+    public void register_success(String uid_str) {
+        int uid = Integer.parseInt(uid_str);
+        DataPersist d = new DataPersist(this.getApplicationContext());
+        d.setUserId(uid);
+        ApiService.confirmUidAndLogin(uid, this);
+    }
+
+    public void register_bad_credentials() {
+        showProgress(false);
+        mPasswordView.setError(getString(R.string.error_incorrect_creds));
+        mPasswordView.requestFocus();
+    }
+
+    public void register_fail() {
+        showProgress(false);
+        Context context = getApplicationContext();
+        CharSequence text = "Oops! We couldn't connect to the server.";
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+    }
+
+
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
@@ -154,6 +214,12 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         //TODO: Replace this with your own logic
         return password.length() > 0;
     }
+
+
+
+
+
+
 
     /**
      * Shows the progress UI and hides the login form.
@@ -243,97 +309,5 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         mEmailView.setAdapter(adapter);
-    }
-
-    /**
-     * Attempts to log the user in if we know the user's ID already.
-     */
-    public void attemptAutoLogin() {
-        showProgress(true);
-        ctx = this.getApplicationContext();
-        DataPersist d = new DataPersist(this.getApplicationContext());
-        Integer uid = d.getUserId();
-        if (uid == null || uid < 0) {
-            showProgress(false);
-            return; // We don't have a uid saved
-        }
-        ApiService.UID_STATUS st = ApiService.isUidStillValid(uid);
-        if (st.equals(ApiService.UID_STATUS.INVALID)) {
-            d.clearStoredUserId();
-            Log.e("NetflixChillAndroid", "The stored userid was invalid. Deleting.");
-            showProgress(false);
-
-            return;
-        }
-        if (st.equals(ApiService.UID_STATUS.CONNECTION_FAILURE)) {
-            // TODO display error
-            Log.e("NetflixChillAndroid", "Could not connect to server for login.");
-            showProgress(false);
-
-            return;
-        }
-
-        assert (st.equals(ApiService.UID_STATUS.VALID));
-
-        // The UID is good
-        Log.i("NetflixChillAndroid", "UID loaded: " + uid);
-
-        Intent intent = new Intent(this, ChillActivity.class);
-        intent.putExtra("uid", uid);
-        showProgress(false);
-
-        startActivity(intent);
-
-        // kill ourselves
-        finish();
-    }
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Integer> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Integer doInBackground(Void... params) {
-            // Todo get user ID
-            Integer user_id = ApiService.login(mEmail, mPassword);
-            return user_id;
-        }
-
-        @Override
-        protected void onPostExecute(final Integer user_id) {
-
-            mAuthTask = null;
-            showProgress(false);
-
-            if (user_id == null) { // network error
-                mPasswordView.setError(getString(R.string.error_network));
-                mPasswordView.requestFocus();
-            } else if (user_id < 0) { // incorrect credentials
-                mPasswordView.setError(getString(R.string.error_incorrect_creds));
-                mPasswordView.requestFocus();
-            } else { // success
-                // save the userID
-                DataPersist d = new DataPersist(LoginActivity.ctx);
-                d.setUserId(user_id);
-                attemptAutoLogin();
-                finish();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
     }
 }

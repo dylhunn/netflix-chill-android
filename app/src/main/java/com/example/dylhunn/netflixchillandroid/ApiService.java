@@ -1,23 +1,46 @@
 package com.example.dylhunn.netflixchillandroid;
 
-import com.android.volley.RequestQueue ;
+import android.content.Context;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 /**
  * Created by richard on 10/10/15.
  */
 public class ApiService {
-    public static final int MODULO = 1_000_000_007;
-
-    public static enum UID_STATUS {VALID, INVALID, CONNECTION_FAILURE};
 
     /**
      * Query the server to check if this is still a valid uid.
      * @param uid
      * @return
      */
-    public static UID_STATUS isUidStillValid(int uid) {
-        if (uid == 9) return UID_STATUS.VALID;
-        return UID_STATUS.INVALID;
+    public static void confirmUidAndLogin(final int uid, final LoginActivity act) {
+
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(act.getApplicationContext());
+        String url = "http://www.google.com";
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        if (response.contains("true")) act.uid_is_valid_and_login(uid);
+                        else if (response.contains("false")) act.uid_is_invalid();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                 act.uid_check_response_error();
+            }
+        });
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 
     /**
@@ -28,8 +51,27 @@ public class ApiService {
      * @param mPassword
      * @return
      */
-    public static Integer login(String mEmail, String mPassword) {
-        return 9;
+    public static void registerOrLookup(String mEmail, String mPassword, final LoginActivity act) {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(act.getApplicationContext());
+        String url = "http://www.google.com";
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        if (response.contains("-1")) act.register_bad_credentials();
+                        else act.register_success(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                act.register_fail();
+            }
+        });
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 
     /**
