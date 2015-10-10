@@ -57,6 +57,11 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Actiona bar text
+        getActionBar().setTitle("Netflix+Chill");
+        getSupportActionBar().setTitle("Netflix+Chill");
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -83,6 +88,8 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        attemptAutoLogin();
     }
 
     private void populateAutoComplete() {
@@ -149,7 +156,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > 0;
     }
 
     /**
@@ -243,10 +250,19 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
     }
 
     /**
+     * Attempts to log the user in if we know the user's ID already.
+     */
+    public void attemptAutoLogin() {
+        Integer uid = DataPersist.getUserId();
+        if (uid == null || uid < 0) return; // Auto-login failed
+        //ApiService.checkUidIsValid(uid);
+    }
+
+    /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, Integer> {
 
         private final String mEmail;
         private final String mPassword;
@@ -257,9 +273,9 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected Integer doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
-
+            /*
             try {
                 // Simulate network access.
                 Thread.sleep(2000);
@@ -274,21 +290,31 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
                     return pieces[1].equals(mPassword);
                 }
             }
+            */
 
-            // TODO: register the new account here.
-            return true;
+            // Todo get user ID
+            Integer user_id = 3; //ApiService.login(mEmail, mPassword);
+
+            return user_id;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final Integer user_id) {
+
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
+            if (user_id == null) { // network error
+                mPasswordView.setError(getString(R.string.error_network));
                 mPasswordView.requestFocus();
+            } else if (user_id < 0) { // incorrect credentials
+                mPasswordView.setError(getString(R.string.error_incorrect_creds));
+                mPasswordView.requestFocus();
+            } else { // success
+                // save the userID
+                DataPersist.setUserId(user_id);
+                attemptAutoLogin();
+                finish();
             }
         }
 
@@ -299,4 +325,3 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         }
     }
 }
-
