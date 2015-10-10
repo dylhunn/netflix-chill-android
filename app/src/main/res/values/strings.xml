@@ -36,5 +36,8 @@
     <string-array name="when_array">
         <item>Tonight</item>
         <item>Tomorrow night</item>
+        <item>This weekend</item>
+        <item>Sometime soon</item>
+
     </string-array>
 </resources>
