@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/NetflixChillAndroid.iml" filepath="$PROJECT_DIR$/NetflixChillAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/netflix-chill-android.iml" filepath="$PROJECT_DIR$/netflix-chill-android.iml" />
     </modules>
   </component>
 </project>
