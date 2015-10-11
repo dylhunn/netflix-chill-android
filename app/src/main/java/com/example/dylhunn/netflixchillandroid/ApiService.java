@@ -1,6 +1,7 @@
 package com.example.dylhunn.netflixchillandroid;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -61,13 +62,14 @@ public class ApiService {
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(act.getApplicationContext());
-        String url = "http://www.google.com";
+        String url = "http://netflix-chill-server.herokuapp.com/sign-in";
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Log.e("NetflixAndChill", "Server response: " + response);
                         if (response.contains("-1")) act.register_bad_credentials();
                         else act.register_success(response);
                     }
