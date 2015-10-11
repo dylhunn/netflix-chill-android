@@ -95,7 +95,7 @@ public class ApiService {
      * @param request
      * @return
      */
-    public static void makeChillRequest(int uid, final ChillRequest request, final ChillActivity act) {
+    public static void makeChillRequest(final int uid, final ChillRequest request, final ChillActivity act) {
         act.chillRequestSucceeded(1); // Testing
         /*
         String url = "http://netflix-chill-server.herokuapp.com/sign-in";
@@ -122,6 +122,7 @@ public class ApiService {
             @Override
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<String, String>();
+                params.put("uid", uid);
                 params.put("genre", request.GENRE);
                 params.put("type", request.TYPE.toString());
                 params.put("day", request.DAY);

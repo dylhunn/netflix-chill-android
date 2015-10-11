@@ -139,6 +139,13 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
             return true;
         }
 
+        if (id == R.id.action_logout) {
+            DataPersist d = new DataPersist(getApplicationContext());
+            d.clearStoredUserId();
+            finish();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

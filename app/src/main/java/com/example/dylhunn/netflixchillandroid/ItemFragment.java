@@ -149,9 +149,16 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
         for (int i = 0; i < matches.size(); i++) {
 
             ChillRequestResponseList<Person> sublist = matches.get(i);
-            String heading += sublist.DATA.GENRE;
+            String heading = sublist.DATA.GENRE;
+            if (sublist.DATA.TYPE == ChillRequest.MediaType.FILM)
+                    heading += " Movie ";
+            else heading += " TV Show ";
+            heading += "on ";
+            heading += sublist.DATA.DAY;
+            heading += " ";
+            heading += sublist.DATA.TIME;
 
-            items.add();
+            items.add(heading);
             listIndicesMap.put(currentIndex, null);
             currentIndex++;
 
