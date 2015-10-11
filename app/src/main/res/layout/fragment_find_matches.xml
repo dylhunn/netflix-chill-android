@@ -25,7 +25,9 @@
         android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true"
         android:spinnerMode="dialog"
-        android:padding="10dp" />
+        android:padding="10dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp" />
 
     <Spinner
         android:layout_width="fill_parent"
@@ -34,16 +36,31 @@
         android:layout_below="@+id/genreSpinner"
         android:layout_centerHorizontal="true"
         android:spinnerMode="dialog"
-        android:padding="10dp" />
+        android:padding="10dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp" />
+
+    <Spinner
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/daySpinner"
+        android:layout_below="@+id/typeSpinner"
+        android:layout_centerHorizontal="true"
+        android:spinnerMode="dialog"
+        android:padding="10dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp" />
 
     <Spinner
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/whenSpinner"
-        android:layout_below="@+id/typeSpinner"
+        android:layout_below="@+id/daySpinner"
         android:layout_centerHorizontal="true"
         android:spinnerMode="dialog"
-        android:padding="10dp" />
+        android:padding="10dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp" />
 
     <Button
         android:layout_width="wrap_content"

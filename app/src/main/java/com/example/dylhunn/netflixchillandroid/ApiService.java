@@ -88,8 +88,9 @@ public class ApiService {
      * @param request
      * @return
      */
-    public static int makeChillRequest(int uid, ChillRequest request) {
-        return -1;
+    public static void makeChillRequest(int uid, ChillRequest request, ChillActivity act) {
+        // TODO connect to server, as above
+        act.chillRequestSucceeded(1); // Testing
     }
 
     /**

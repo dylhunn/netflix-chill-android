@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.util.Log;
+import java.lang.Thread;
 
 import android.location.Location;
 import android.widget.Toast;
@@ -30,7 +31,7 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationServices;
 
 public class ChillActivity extends ActionBarActivity implements ActionBar.TabListener, FindMatchesFragment.OnFragmentInteractionListener,
-        ConnectionCallbacks, OnConnectionFailedListener {
+        ConnectionCallbacks, OnConnectionFailedListener, ItemFragment.OnFragmentInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -43,6 +44,8 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private int uid;
+
+    private Toast activelyWorkingToast;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -110,6 +113,8 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
+        activelyWorkingToast = Toast.makeText(this.getApplicationContext(),
+                "Making your request...", Toast.LENGTH_SHORT);
 
         setTitle("Netflix+Chill");
     }
@@ -171,7 +176,7 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
                     return FindMatchesFragment.newInstance("" + uid);
                 case 1:
                     // return the matches page fragment
-                    return PlaceholderFragment.newInstance(position + 1);
+                    return ItemFragment.newInstance("foo", "bar");
                 default:
 
             }
@@ -223,10 +228,10 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
 
     }
 
-
     public void goClicked(View v) {
         Spinner genreSpn = (Spinner) findViewById(R.id.genreSpinner);
         Spinner typeSpn = (Spinner) findViewById(R.id.typeSpinner);
+        Spinner daySpn = (Spinner) findViewById(R.id.daySpinner);
         Spinner whenSpn = (Spinner) findViewById(R.id.whenSpinner);
         String type = typeSpn.getSelectedItem().toString();
         ChillRequest.MediaType mtype;
@@ -236,25 +241,37 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
             mtype = ChillRequest.MediaType.FILM;
         }
 
-        ChillRequest cr = new ChillRequest(genreSpn.getSelectedItem().toString(), mtype);
+        ChillRequest cr = new ChillRequest(genreSpn.getSelectedItem().toString(), mtype,
+                daySpn.getSelectedItem().toString(), whenSpn.getSelectedItem().toString());
 
-        int chillRequestId = ApiService.makeChillRequest(uid, cr);
+        ApiService.makeChillRequest(uid, cr, this);
 
-        // something failed
-        if (chillRequestId == -1) {
-            Context context = getApplicationContext();
-            CharSequence text = "Oops! We couldn't make your request.";
-            int duration = Toast.LENGTH_LONG;
+        activelyWorkingToast.show();
+    }
 
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        } else {
-            // slide to next tab
-            getSupportActionBar().setSelectedNavigationItem(1);
-        }
+    public void chillRequestSucceeded(int chill_id) {
+        // slide to next tab
+        getSupportActionBar().setSelectedNavigationItem(1);
+        Context context = getApplicationContext();
+        //if (activelyWorkingToast != null) activelyWorkingToast.cancel();
+        CharSequence text = "Done. We will find you some matches!";
+        activelyWorkingToast.setText(text);
+        activelyWorkingToast.show();
+    }
 
+    public void chillRequestFailed() {
+        Context context = getApplicationContext();
+        CharSequence text = "Something went wrong!";
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+    }
+
+    @Override
+    public void onFragmentInteraction(String id) {
 
     }
+
     /**
      * A placeholder fragment containing a simple view.
      */

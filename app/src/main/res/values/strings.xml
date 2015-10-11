@@ -29,15 +29,23 @@
     </string-array>
 
     <string-array name="type_array">
-        <item>Movie</item>
+        <item>Film</item>
         <item>TV Show</item>
     </string-array>
 
-    <string-array name="when_array">
-        <item>Tonight</item>
-        <item>Tomorrow night</item>
-        <item>This weekend</item>
-        <item>Sometime soon</item>
+    <string-array name="day_array">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
 
+    <string-array name="when_array">
+        <item>Morning</item>
+        <item>Afternoon</item>
+        <item>Evening</item>
     </string-array>
 </resources>

@@ -81,7 +81,6 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         // Action bar text
         setTitle("Netflix+Chill");
 
-
         // Let's try the default login
         DataPersist d = new DataPersist(getApplicationContext());
         Integer stored_uid = d.getUserId();

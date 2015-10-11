@@ -91,6 +91,15 @@ public class FindMatchesFragment extends Fragment {
         // Apply the adapter to the spinner
         tspinner.setAdapter(tadapter);
 
+        Spinner dSpinner = (Spinner) view.findViewById(R.id.daySpinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> dadapter = ArrayAdapter.createFromResource(view.getContext(),
+                R.array.day_array, R.layout.spinner_item_layout);
+        // Specify the layout to use when the list of choices appears
+        dadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        dSpinner.setAdapter(dadapter);
+
         Spinner wspinner = (Spinner) view.findViewById(R.id.whenSpinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> wadapter = ArrayAdapter.createFromResource(view.getContext(),
