@@ -202,11 +202,12 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         toast.show();
     }
 
-
-
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        if (!email.contains("@")) return false;
+        if (!email.substring(email.indexOf('@')).contains(".")) return false;
+        if (email.contains(" ")) return false;
+        return true;
     }
 
     private boolean isPasswordValid(String password) {

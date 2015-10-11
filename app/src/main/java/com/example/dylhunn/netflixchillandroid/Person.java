@@ -7,9 +7,12 @@ public class Person {
 
     public final String NAME;
     public final int UID;
+    public final double PRIORITY;
 
-    public Person(String name, int uid) {
+    // priority is a double, higher values indicate better matches
+    public Person(String name, int uid, double priority) {
         NAME = name;
         UID = uid;
+        PRIORITY = priority;
     }
 }

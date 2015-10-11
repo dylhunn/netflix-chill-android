@@ -13,6 +13,10 @@ public class ChillRequest {
     // could be null if we don't know the location
     public final Location LOCATION;
 
+    // used to sort requests chronologically
+    // lower values are chronologically earlier
+    public final int PRIORITY;
+
 
     public enum MediaType {FILM, TV_SHOW};
 
@@ -25,14 +29,16 @@ public class ChillRequest {
         GENRE = genre;
         DAY = day;
         TIME = time;
+        PRIORITY = 0;
     }
 
-    public ChillRequest(String genre, MediaType type, String day, String time, Location loc) {
+    public ChillRequest(String genre, MediaType type, String day, String time, Location loc, int priority) {
 
         LOCATION = loc;
         TYPE = type;
         GENRE = genre;
         DAY = day;
         TIME = time;
+        PRIORITY = priority;
     }
 }

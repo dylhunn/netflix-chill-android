@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 import org.json.JSONObject;
 import com.android.volley.toolbox.JsonObjectRequest;
 
@@ -181,7 +182,7 @@ public class ApiService {
     public static void deleteChillRequest(final int chill_id, final ChillActivity act) {
         act.chillRequestSucceeded(1); // Testing
 
-        String url = "http://netflix-chill-server.herokuapp.com/sign-in";
+        String url = "http://netflix-chill-server.herokuapp.com/delete-chill-request";
 
         RequestQueue queue = Volley.newRequestQueue(act.getApplicationContext());
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -215,26 +216,101 @@ public class ApiService {
     }
 
     public static void fetchMatches(final int uid, final ItemFragment fr) {
+
+
         // mock
+
         List<ChillRequestResponseList<Person>> entries = new ArrayList<>();
-        ChillRequest cr = new ChillRequest("Horror", ChillRequest.MediaType.FILM, "Monday", "Evening", null);
+        ChillRequest cr = new ChillRequest("Horror", ChillRequest.MediaType.FILM, "Monday", "Evening", null, 2);
         ChillRequestResponseList<Person> one = new ChillRequestResponseList<>(32, cr);
-        one.add(new Person("Suzie", 1));
-        one.add(new Person("Ben", 2));
-        one.add(new Person("Roger", 41));
-        one.add(new Person("Jamal", 6));
-        ChillRequest cr3 = new ChillRequest("Drama", ChillRequest.MediaType.TV_SHOW, "Friday", "Morning", null);
+        one.add(new Person("Suzie", 1, 1));
+        one.add(new Person("Ben", 2, .9));
+        one.add(new Person("Roger", 41, .1));
+        one.add(new Person("Jamal", 6, .8));
+        ChillRequest cr3 = new ChillRequest("Drama", ChillRequest.MediaType.TV_SHOW, "Friday", "Morning", null, 1);
         ChillRequestResponseList<Person> three = new ChillRequestResponseList<>(12, cr3);
-        ChillRequest cr2 = new ChillRequest("Drama", ChillRequest.MediaType.TV_SHOW, "Tuesday", "Morning", null);
+        ChillRequest cr2 = new ChillRequest("Drama", ChillRequest.MediaType.TV_SHOW, "Tuesday", "Morning", null, 3);
         ChillRequestResponseList<Person> two = new ChillRequestResponseList<>(72, cr2);
-        two.add(new Person("Suzie", 1));
-        two.add(new Person("Ben", 2));
+        two.add(new Person("Suzie", 1, .7));
+        two.add(new Person("Ben", 2, .9));
         entries.add(one);
         entries.add(three);
         entries.add(two);
 
-        List<ChillRequestResponseList<Person>> entries2 = new ArrayList<>();
+        fr.populate(entries);
+        return;
+/*
+        String url = "http://netflix-chill-server.herokuapp.com/get-chill-matches";
+        RequestQueue queue = Volley.newRequestQueue(fr.getActivity().getApplicationContext());
+        Map<String,String> params = new HashMap<String, String>();
+        params.put("uid", "" + uid);
+        JSONObject jso = new JSONObject(params);
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, url, jso, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    // re-populate queue
+                    fr.populate(parseMatchEntriesFromJson(response));
+                } catch (Exception e) {
+                    fr.populate(new ArrayList<ChillRequestResponseList<Person>>());
+                    Log.e("NetflixAndChill", "Exception thrown while parsing matches.");
+                }
 
-        fr.populate(entries2);
+                List<ChillRequestResponseList<Person>> entries = new ArrayList<>();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // populate the queue anyway, it will display the blank message
+                fr.populate(new ArrayList<ChillRequestResponseList<Person>>());
+                Log.e("NetflixAndChill", "Error retrieving matches.");
+            }
+        });
+
+        queue.add(jsObjRequest);*/
+    }
+
+    private static List<ChillRequestResponseList<Person>> parseMatchEntriesFromJson(JSONObject response) {
+        List<ChillRequestResponseList<Person>> entries = new ArrayList<>();
+        try {
+            Iterator<String> it = response.keys();
+            while (it.hasNext()) {
+                int chillRequestId;
+
+                chillRequestId = Integer.parseInt(it.next());
+
+                JSONObject chillRequestDataJson = response.getJSONObject("" + chillRequestId);
+                String genre = chillRequestDataJson.getString("genre");
+                String day = chillRequestDataJson.getString("day");
+                String time = chillRequestDataJson.getString("time");
+                String type = chillRequestDataJson.getString("type");
+                int priority = chillRequestDataJson.getInt("priority");
+
+                ChillRequest.MediaType mediaType;
+                if (type.contains("tv") || type.contains("TV")) mediaType = ChillRequest.MediaType.TV_SHOW;
+                else mediaType = ChillRequest.MediaType.FILM;
+
+                ChillRequest requestData = new ChillRequest(genre, mediaType, day, time, null, priority);
+
+                ChillRequestResponseList<Person> responseList = new ChillRequestResponseList<>(chillRequestId, requestData);
+
+                JSONObject matches = chillRequestDataJson.getJSONObject("matches");
+                Iterator<String> it2 = matches.keys();
+
+                while (it2.hasNext()) {
+                    int match_uid = Integer.parseInt(it2.next());
+                    JSONObject match_data_dict = matches.getJSONObject(match_uid + "");
+                    String match_email = match_data_dict.getString("email");
+                    double match_priority = match_data_dict.getDouble("priority");
+                    Person p = new Person(match_email, match_uid, match_priority);
+                    responseList.add(p);
+                }
+            }
+        } catch (Exception e) {
+            Log.e("NetflixAndChill", "Malformed chill request match JSON.");
+            return entries;
+        }
+
+        return entries;
     }
 }

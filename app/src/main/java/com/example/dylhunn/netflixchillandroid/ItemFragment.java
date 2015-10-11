@@ -18,9 +18,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import android.widget.BaseAdapter;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import com.example.dylhunn.netflixchillandroid.dummy.DummyContent;
 
@@ -145,6 +148,14 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
      */
     public void populate(List<ChillRequestResponseList<Person>> matches) {
 
+        // sort by "priority" for chronological order
+        Collections.sort(matches, new Comparator<ChillRequestResponseList<Person>>() {
+            @Override
+            public int compare(ChillRequestResponseList<Person> lhs, ChillRequestResponseList<Person> rhs) {
+                return lhs.DATA.PRIORITY - rhs.DATA.PRIORITY;
+            }
+        });
+
         listIndicesMap = new HashMap<>();
 
         int currentIndex = 0;
@@ -152,6 +163,15 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
         for (int i = 0; i < matches.size(); i++) {
 
             ChillRequestResponseList<Person> sublist = matches.get(i);
+
+            // Sort people by matching score! Higher is better.
+            Collections.sort(sublist, new Comparator<Person>() {
+                @Override
+                public int compare(Person lhs, Person rhs) {
+                    return (rhs.PRIORITY - lhs.PRIORITY) > 0 ? 1 : -1;
+                }
+            });
+
             String heading = sublist.DATA.GENRE;
             if (sublist.DATA.TYPE == ChillRequest.MediaType.FILM)
                     heading += " Movie ";
