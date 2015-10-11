@@ -26,4 +26,13 @@ public class ChillRequest {
         DAY = day;
         TIME = time;
     }
+
+    public ChillRequest(String genre, MediaType type, String day, String time, Location loc) {
+
+        LOCATION = loc;
+        TYPE = type;
+        GENRE = genre;
+        DAY = day;
+        TIME = time;
+    }
 }

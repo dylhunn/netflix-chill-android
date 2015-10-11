@@ -12,8 +12,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import java.util.ArrayList;
+import android.widget.BaseAdapter;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import com.example.dylhunn.netflixchillandroid.dummy.DummyContent;
 
@@ -39,10 +42,16 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
 
     private OnFragmentInteractionListener mListener;
 
+    ArrayList<String> items = new ArrayList<>();
+
     /**
      * The fragment's ListView/GridView.
      */
     private AbsListView mListView;
+
+    // a mapping from positions in the listview to the person at that position
+    // if that position is a menu, title, or header, person is null
+    public Map<Integer, Person> listIndicesMap;
 
     /**
      * The Adapter which will be used to populate the ListView/GridView with
@@ -77,8 +86,10 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
         }
 
         // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, new ArrayList<DummyContent.DummyItem>());
+        mAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1, android.R.id.text1, items);
+        listIndicesMap = new HashMap<>();
+
     }
 
     @Override
@@ -93,6 +104,8 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
 
+        ApiService.fetchMatches(ChillActivity.uid, this);
+
         return view;
     }
 
@@ -105,6 +118,7 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+
     }
 
     @Override
@@ -127,6 +141,34 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
      * response is itself a list of user IDs who are matched for that request.
      */
     public void populate(List<ChillRequestResponseList<Person>> matches) {
+
+        listIndicesMap = new HashMap<>();
+
+        int currentIndex = 0;
+
+        for (int i = 0; i < matches.size(); i++) {
+
+            ChillRequestResponseList<Person> sublist = matches.get(i);
+            String heading += sublist.DATA.GENRE;
+
+            items.add();
+            listIndicesMap.put(currentIndex, null);
+            currentIndex++;
+
+            int j;
+            for (j = 0; j < sublist.size(); j++) {
+                items.add("   " + sublist.get(j).NAME);
+                listIndicesMap.put(currentIndex, sublist.get(j));
+                currentIndex++;
+            }
+            if (j == 0) {
+                items.add("   No matches yet");
+                listIndicesMap.put(currentIndex, null);
+                currentIndex++;
+            }
+        }
+
+        ((BaseAdapter) mListView.getAdapter()).notifyDataSetChanged();
     }
 
     /**

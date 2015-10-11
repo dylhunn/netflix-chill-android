@@ -43,7 +43,7 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    private int uid;
+    public static int uid;
 
     private Toast activelyWorkingToast;
 
@@ -262,6 +262,22 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
     public void chillRequestFailed() {
         Context context = getApplicationContext();
         CharSequence text = "Something went wrong!";
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+    }
+
+    public void chillDeleteSuccess() {
+        Context context = getApplicationContext();
+        CharSequence text = "Deleted.";
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+    }
+
+    public void chillDeleteFailure() {
+        Context context = getApplicationContext();
+        CharSequence text = "Oops: unable to delete.";
         int duration = Toast.LENGTH_LONG;
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
