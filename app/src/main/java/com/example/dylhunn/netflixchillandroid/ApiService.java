@@ -162,6 +162,10 @@ public class ApiService {
                 }
                 if (responseNum < 0) act.chillRequestFailed();
                 act.chillRequestSucceeded(responseNum);
+
+                // Also, invoke a Chill Match update
+
+
             }
         }, new Response.ErrorListener() {
 
@@ -308,6 +312,7 @@ public class ApiService {
             }
         } catch (Exception e) {
             Log.e("NetflixAndChill", "Malformed chill request match JSON.");
+            Log.e("NetflixAndChill", "Server sent: " + response.toString());
             return entries;
         }
 

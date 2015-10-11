@@ -23,4 +23,12 @@
         android:id="@+id/comeBackView"
         android:visibility="gone"/>
 
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Refresh"
+        android:id="@+id/refreshButton"
+        android:layout_gravity="center_horizontal|bottom"
+        android:onClick="refresh"/>
+
 </FrameLayout>

@@ -5,8 +5,10 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
+import android.view.View.OnClickListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.widget.Button;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,6 +116,13 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
 
+        Button mButton = (Button) view.findViewById(R.id.refreshButton);
+        mButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                ApiService.fetchMatches(ChillActivity.uid, ItemFragment.this);
+            }
+        });
+
         ApiService.fetchMatches(ChillActivity.uid, this);
 
         return view;
@@ -157,6 +166,7 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
      * response is itself a list of user IDs who are matched for that request.
      */
     public void populate(List<ChillRequestResponseList<Person>> matches) {
+        items.clear();
 
         // sort by "priority" for chronological order
         Collections.sort(matches, new Comparator<ChillRequestResponseList<Person>>() {
