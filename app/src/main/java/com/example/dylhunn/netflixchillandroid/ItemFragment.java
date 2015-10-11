@@ -1,6 +1,10 @@
 package com.example.dylhunn.netflixchillandroid;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -118,7 +122,6 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-
     }
 
     @Override
@@ -175,6 +178,14 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
             }
         }
 
+        if (currentIndex == 0) { // we are still empty :(
+           // showProgress(true);
+
+            items.add("No matches yet.");
+        } else { // not empty!
+           // showProgress(false);
+        }
+
         ((BaseAdapter) mListView.getAdapter()).notifyDataSetChanged();
     }
 
@@ -204,6 +215,48 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
+    }
+
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+
+        final View mProgressView = getView().findViewById(R.id.login_progress);
+        final View mTextView = getView().findViewById(R.id.comeBackView);
+
+
+        // On Honeycomb MR2 we have th\e ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+
+            mTextView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mTextView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mTextView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mTextView.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
     }
 
 }

@@ -7,6 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import org.json.JSONObject;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -27,29 +32,43 @@ public class ApiService {
      */
     public static void confirmUidAndLogin(final int uid, final LoginActivity act) {
         // Testing only
-        act.uid_is_valid_and_login(uid);
+        //act.uid_is_valid_and_login(uid);
 
 
-        // Instantiate the RequestQueue.
+        String url = "http://netflix-chill-server.herokuapp.com/verify-user-exists";
+
         RequestQueue queue = Volley.newRequestQueue(act.getApplicationContext());
-        String url = "http://www.google.com";
 
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        if (response.contains("true")) act.uid_is_valid_and_login(uid);
-                        else if (response.contains("false")) act.uid_is_invalid();
+        Map<String,String> params = new HashMap<String, String>();
+        params.put("uid", uid + "");
+
+        JSONObject jso = new JSONObject(params);
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, url, jso, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("NetflixAndChill", "Server verification returned: " + response.toString());
+                try {
+                    if (response.get("user_exists").toString().contains("true")) {
+                        act.uid_is_valid_and_login(uid);
                     }
-                }, new Response.ErrorListener() {
+                    else if (response.get("user_exists").toString().contains("false")) {
+                        act.uid_is_invalid();
+                    }
+                } catch (Exception e) {
+                    act.uid_check_response_error();
+                }
+            }
+        }, new Response.ErrorListener() {
+
             @Override
             public void onErrorResponse(VolleyError error) {
-                 act.uid_check_response_error();
+                act.uid_check_response_error();
             }
         });
-        // Add the request to the RequestQueue.
-        queue.add(stringRequest);
+
+        queue.add(jsObjRequest);
     }
 
     /**
@@ -62,30 +81,46 @@ public class ApiService {
      */
     public static void registerOrLookup(String mEmail, String mPassword, final LoginActivity act) {
         // Testing only
-        act.register_success("1");
+        //act.register_success("1");
 
-
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(act.getApplicationContext());
         String url = "http://netflix-chill-server.herokuapp.com/sign-in";
 
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.e("NetflixAndChill", "Server response: " + response);
-                        if (response.contains("-1")) act.register_bad_credentials();
-                        else act.register_success(response);
+        RequestQueue queue = Volley.newRequestQueue(act.getApplicationContext());
+
+        Map<String,String> params = new HashMap<String, String>();
+        params.put("nf_un", mEmail);
+        params.put("nf_pw", mPassword);
+
+        JSONObject jso = new JSONObject(params);
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, url, jso, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.e("NetflixAndChill", "Server response to account registration: " + response.toString());
+                try {
+                    if (("" + response.getInt("user_id")).contains("-1")) { // :(
+                        act.register_bad_credentials();
                     }
-                }, new Response.ErrorListener() {
+                    else {
+                        act.register_success("" + response.getInt("user_id"));
+                    }
+                } catch (Exception e) {
+                    act.register_fail();
+
+                }
+            }
+        }, new Response.ErrorListener() {
+
             @Override
             public void onErrorResponse(VolleyError error) {
                 act.register_fail();
+
             }
         });
-        // Add the request to the RequestQueue.
-        queue.add(stringRequest);
+
+        queue.add(jsObjRequest);
+
     }
 
     /**
@@ -96,52 +131,47 @@ public class ApiService {
      * @return
      */
     public static void makeChillRequest(final int uid, final ChillRequest request, final ChillActivity act) {
-        act.chillRequestSucceeded(1); // Testing
-        /*
-        String url = "http://netflix-chill-server.herokuapp.com/sign-in";
+        //act.chillRequestSucceeded(1); // Testing
+
+        String url = "http://netflix-chill-server.herokuapp.com/create-chill-request";
 
         RequestQueue queue = Volley.newRequestQueue(act.getApplicationContext());
-        StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+
+        Map<String,String> params = new HashMap<String, String>();
+        params.put("uid", "" + uid);
+        params.put("genre", request.GENRE);
+        params.put("type", request.TYPE.toString());
+        params.put("day", request.DAY);
+        params.put("time", request.TIME);
+        params.put("latitude", "" + request.LOCATION.getLatitude());
+        params.put("longitude", "" + request.LOCATION.getLongitude());
+
+        JSONObject jso = new JSONObject(params);
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, url, jso, new Response.Listener<JSONObject>() {
+
             @Override
-            public void onResponse(String response) {
+            public void onResponse(JSONObject response) {
+
                 int responseNum = -1;
                 try {
-                    responseNum = Integer.parseInt(response);
+                    responseNum = response.getInt("chill_request_id");
                 } catch (Exception e) {
-                    // malformed data returned
+                    act.chillRequestFailed();
                 }
                 if (responseNum < 0) act.chillRequestFailed();
                 act.chillRequestSucceeded(responseNum);
             }
         }, new Response.ErrorListener() {
+
             @Override
             public void onErrorResponse(VolleyError error) {
                 act.chillRequestFailed();
-            }
-        }){
-            @Override
-            protected Map<String,String> getParams(){
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("uid", uid);
-                params.put("genre", request.GENRE);
-                params.put("type", request.TYPE.toString());
-                params.put("day", request.DAY);
-                params.put("time", request.TIME);
-                params.put("latitude", "" + request.LOCATION.getLatitude());
-                params.put("longitude", "" + request.LOCATION.getLongitude());
 
-                return params;
             }
+        });
 
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("Content-Type","application/x-www-form-urlencoded");
-                return params;
-            }
-        };
-        queue.add(sr);
-*/
+        queue.add(jsObjRequest);
     }
 
     /**
@@ -203,6 +233,8 @@ public class ApiService {
         entries.add(three);
         entries.add(two);
 
-        fr.populate(entries);
+        List<ChillRequestResponseList<Person>> entries2 = new ArrayList<>();
+
+        fr.populate(entries2);
     }
 }

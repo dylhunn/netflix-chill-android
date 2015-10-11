@@ -116,7 +116,7 @@ public class ChillActivity extends ActionBarActivity implements ActionBar.TabLis
         activelyWorkingToast = Toast.makeText(this.getApplicationContext(),
                 "Making your request...", Toast.LENGTH_SHORT);
 
-        setTitle("Netflix+Chill");
+        setTitle("Chillax");
     }
 
 

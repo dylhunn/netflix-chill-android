@@ -79,7 +79,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         mProgressView = findViewById(R.id.login_progress);
 
         // Action bar text
-        setTitle("Netflix+Chill");
+        setTitle("Chillax");
 
         // Let's try the default login
         DataPersist d = new DataPersist(getApplicationContext());
@@ -213,12 +213,6 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         //TODO: Replace this with your own logic
         return password.length() > 0;
     }
-
-
-
-
-
-
 
     /**
      * Shows the progress UI and hides the login form.
