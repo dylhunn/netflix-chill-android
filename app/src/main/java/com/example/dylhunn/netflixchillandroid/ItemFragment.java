@@ -56,6 +56,9 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
      */
     private AbsListView mListView;
 
+
+    private Integer myUid = null;
+
     // a mapping from positions in the listview to the person at that position
     // if that position is a menu, title, or header, person is null
     public Map<Integer, Person> listIndicesMap;
@@ -138,7 +141,14 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+            mListener.onFragmentInteraction(id + "");
+
+            Person chatTarget = listIndicesMap.get(Integer.parseInt(id + ""));
+
+            // The user clicked something dumb like a header
+            if (chatTarget == null) return;
+
+            // TODO onclick action
         }
     }
 

@@ -220,7 +220,7 @@ public class ApiService {
 
         // mock
 
-        List<ChillRequestResponseList<Person>> entries = new ArrayList<>();
+       /* List<ChillRequestResponseList<Person>> entries = new ArrayList<>();
         ChillRequest cr = new ChillRequest("Horror", ChillRequest.MediaType.FILM, "Monday", "Evening", null, 2);
         ChillRequestResponseList<Person> one = new ChillRequestResponseList<>(32, cr);
         one.add(new Person("Suzie", 1, 1));
@@ -238,8 +238,8 @@ public class ApiService {
         entries.add(two);
 
         fr.populate(entries);
-        return;
-/*
+        return;*/
+
         String url = "http://netflix-chill-server.herokuapp.com/get-chill-matches";
         RequestQueue queue = Volley.newRequestQueue(fr.getActivity().getApplicationContext());
         Map<String,String> params = new HashMap<String, String>();
@@ -267,7 +267,7 @@ public class ApiService {
             }
         });
 
-        queue.add(jsObjRequest);*/
+        queue.add(jsObjRequest);
     }
 
     private static List<ChillRequestResponseList<Person>> parseMatchEntriesFromJson(JSONObject response) {
