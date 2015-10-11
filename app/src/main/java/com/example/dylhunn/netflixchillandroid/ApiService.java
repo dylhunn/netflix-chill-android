@@ -275,6 +275,7 @@ public class ApiService {
     }
 
     private static List<ChillRequestResponseList<Person>> parseMatchEntriesFromJson(JSONObject response) {
+        Log.i("NetflixAndChill", "Server sent: " + response.toString());
         List<ChillRequestResponseList<Person>> entries = new ArrayList<>();
         try {
             Iterator<String> it = response.keys();
@@ -309,6 +310,7 @@ public class ApiService {
                     Person p = new Person(match_email, match_uid, match_priority);
                     responseList.add(p);
                 }
+                entries.add(responseList);
             }
         } catch (Exception e) {
             Log.e("NetflixAndChill", "Malformed chill request match JSON.");
